@@ -1,0 +1,126 @@
+ html,
+      body {
+        font-family: 'Courgette', cursive;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        max-width:100%;
+      }
+      .container {
+        height: 100%;
+        position: relative;
+      }
+      input {
+        font-size: 12px;
+      }
+      h1 {
+        color: #525454;
+        font-size: 22px;
+        margin: 0 0 10px 0;
+        text-align: center;
+      }
+      hr {
+        background: #D0D7D9;
+        height: 1px;
+        margin: 20px 0 20px 0;
+        border: none;
+      }
+      .map {
+        bottom:0px;
+        height: 100%;
+        left: 0px;
+        position: absolute;
+        right: 0px;
+        z-index: 1;
+      }
+      .search-box {
+        padding-left:20px;
+      }
+      .pano {
+        width: 200px;
+        height: 200px;
+      }
+      .text {
+        font-size: 12px;
+      }
+     .popularPlace {
+	    max-width: 300px;
+	    padding-left: 2px;
+	    padding-right: 2px;
+	    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+	    border-radius: 3px;
+	    z-index: 2;
+	    position: fixed;
+	    top: 15px;
+	    right: 15px;
+	    background-color: #FFFFFF;
+	   }
+  	.popularHeader {
+  		text-align: center;
+  	}
+  	.fourSquareLoc {
+  		height:700px;
+  		padding:10px;
+  		max-width:100%;
+  		list-style-type: none;
+  		overflow: scroll;
+  	}
+  	.fourSquareLoc::-webkit-scrollbar {
+      width: 10px;
+      overflow:visible;
+  	}
+  	.fourSquareLoc::-webkit-scrollbar-thumb {
+    	background-color: blue;
+    	outline: 1px solid slategrey;
+  	}
+    .search-box { 
+      display: flex;   
+      padding-top: 50px;
+    }
+    .search-listings {
+      height:50px;
+      width:30%;
+      margin: 0px;          
+      border: none;
+      z-index: 13;
+    }
+    .search-button
+    {
+      background: url("../images/Search-icon.png");
+      background-size: 50px;
+      border-color: blue;
+      height:50px;
+      width:50px;
+      border: 0px;
+      border-top-right-radius: 2px;
+      border-bottom-right-radius: 2px;    
+      outline: 0;
+      cursor: pointer;
+      z-index: 12;
+    }
+    .currentLocation-box 
+    {      
+      z-index: 100;
+      bottom:50px;
+      height:50px;
+      width:30%;
+      left: 40px;
+      position: fixed;
+      display: flex;
+    }
+    #currentlocation-button {
+       background: url("../images/maps-icon.png");
+       background-size: 50px;
+       height:50px;
+       width:50px;
+       border-radius: 50px;   
+       outline: 0;
+       border-color: red;
+       cursor: pointer;       
+    }
+    .currentLocation-input {
+      height:30px;
+      width:40%;
+      padding-left: 10px;
+      margin-left: 10px;
+    }

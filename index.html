@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <link href='https://fonts.googleapis.com/css?family=Courgette' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="search-box">        
+          <input class="search-listings" placeholder="Search places from the List">
+          <button class="search-button"></button>        
+      </div>
+      <div class="currentLocation-box">
+        <button class="currentlocation-button"></button>
+        <input data-bind="text: currentLocation"class="currentLocation-input">
+      </div>
+       <div class="popularPlace">
+       	 <div class="popularHeader"> 
+         	 <h2> Popular Places</h2>
+         	 <hr>
+       	 </div>
+          <ul class="fourSquareLoc"></ul>
+        </div>
+        <div id="map"></div>
+      </div>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/main.js"></script>
+    <script type="text/javascript" src="js/knockout-3.4.0.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDy6bA5-iY3yK6kPFwxqERL64GII0CnQGglibraries=places">
+</script>
+</body>
+</html>
