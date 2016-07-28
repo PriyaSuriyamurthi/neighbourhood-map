@@ -2,31 +2,54 @@
 <html>
   <head>
   <link href='https://fonts.googleapis.com/css?family=Courgette' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans:700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
   <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
     <div class="container">
+      <div id="map"></div>
       <div class="search-box">        
-          <input class="search-listings" placeholder="Search places from the List">
-          <button class="search-button"></button>        
+          <input data-bind="value:searchData" class="search-listings" placeholder="Search places from the List">
+          <button data-bind=" click:searchList" class="search-button" type="submit"></button>        
       </div>
       <div class="currentLocation-box">
-        <button class="currentlocation-button"></button>
-        <input data-bind="text: currentLocation"class="currentLocation-input">
+       
+        <input data-bind=" value:currentLocation" class="currentLocation-input" value="">
+         <button data-bind="click:changeLocation" class="currentlocation-button" type="submit"></button>
       </div>
        <div class="popularPlace">
        	 <div class="popularHeader"> 
-         	 <h2> Popular Places</h2>
-         	 <hr>
+         <i class="fa fa-map-marker fa-4x" aria-hidden="true"></i>
+         	 <h2 class="popularHtext"> Popular Places</h2>
        	 </div>
-          <ul class="fourSquareLoc"></ul>
-        </div>
-        <div id="map"></div>
+         <hr>
+          <ul data-bind="foreach: famousList" class="fourSquareLoc">
+            <li > 
+            <div data-bind ="click: $root.showInfo" class="cursorLi">
+             <p data-bind="text: $data.popName" class="popName"> </p>
+             <p data-bind="text: $data.popCategory" class="popCategory"> </p>
+             <img src="" data-bind="attr:{src:$data.popImg}" class="img-responsive popImg">
+             <i class="fa fa-thumb-tack" aria-hidden="true"></i>
+             <p data-bind="text: $data.popAddr" class="popAddr"> </p>
+             <i class="fa fa-phone" aria-hidden="true"></i>
+             <p data-bind="text: $data.popPhone" class="popPhone"> </p>
+             </div>
+             <h4 class="tipHeader">Tips:</h4>
+             <p data-bind="text: $data.popTips" class="popTips"></p>
+             <a data-bind=" attr:{href: $data.popURL},text: $data.popURL" target="_blank" class="popURL"></a>
+            </li> 
+
+            <hr>
+          </ul>
+          <span class="no-result" data-bind="visible: !famousList().length">No Result Found</span>
+        </div>       
       </div>
     <script src="js/jquery.min.js"></script>
     <script src="js/main.js"></script>
     <script type="text/javascript" src="js/knockout-3.4.0.js"></script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDy6bA5-iY3yK6kPFwxqERL64GII0CnQGglibraries=places">
-</script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyDy6bA5-iY3yK6kPFwxqERL64GII0CnQGg">
+    </script>
+
 </body>
 </html>

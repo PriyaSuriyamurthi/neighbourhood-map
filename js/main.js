@@ -1,151 +1,249 @@
 
-function model() {
-
-};
-
 var ViewModel = function() {
       var self = this;
       var map;
+      var bounds;
       // Create a new blank array for all the listing markers.
       var markers = [];
-        var currentLocation="Austin";
-      self.currentLocation = ko.observable(currentLocation);
-      var url="https://api.foursquare.com/v2/venues/search?client_id=QRFWJTS1ITKK3SGV3C3YMHOPY2OGYJWKVKKLLP5SZKLXPBSM&client_secret=XM0IRYFCUVW4WENIKHR111BGJ2AFWLYCGGD2ZT4I211TPZZJ&v=20130815&ll=40.7,-74&limit=15"
-      var prev_infowindow =false;       
-       
+      this.photoPlaceHolder = 'http://placehold.it/100x100';
+      var updateMarker = markers;
+      var infowindow;
+      var currentLocation="Austin";
+      self.currentLocation = ko.observable(currentLocation);   
+      self.famousList = ko.observableArray([]);  
+      self.famousPicklist = ko.observableArray(self.famousList());
+      var currLat;
+      var currLng;
+      var venuePhoto=[];
+      var limit = "&limit=20&section=popularPicks";
+      var clientId = "&client_id=QRFWJTS1ITKK3SGV3C3YMHOPY2OGYJWKVKKLLP5SZKLXPBSM&client_secret=XM0IRYFCUVW4WENIKHR111BGJ2AFWLYCGGD2ZT4I211TPZZJ&v=20160115";
+
+      self.searchData = ko.observable("");
       function  initializeMap() {
         // Create a styles array to use with the map.
-        var styles = [{"featureType":"landscape","stylers":[{"hue":"#FFBB00"},{"saturation":43.400000000000006},{"lightness":37.599999999999994},{"gamma":1}]},{"featureType":"road.highway","stylers":[{"hue":"#FFC200"},{"saturation":-61.8},{"lightness":45.599999999999994},{"gamma":1}]},{"featureType":"road.arterial","stylers":[{"hue":"#FF0300"},{"saturation":-100},{"lightness":51.19999999999999},{"gamma":1}]},{"featureType":"road.local","stylers":[{"hue":"#FF0300"},{"saturation":-100},{"lightness":52},{"gamma":1}]},{"featureType":"water","stylers":[{"hue":"#0078FF"},{"saturation":-13.200000000000003},{"lightness":2.4000000000000057},{"gamma":1}]},{"featureType":"poi","stylers":[{"hue":"#00FF6A"},{"saturation":-1.0989010989011234},{"lightness":11.200000000000017},{"gamma":1}]}];
-        // Constructor creates a new map - only center and zoom are required.
+        var styles = [{"featureType":"landscape","stylers":[{"hue":"#FFA800"},{"saturation":0},{"lightness":0},{"gamma":1}]},{"featureType":"road.highway","stylers":[{"hue":"#53FF00"},{"saturation":-73},{"lightness":40},{"gamma":1}]},{"featureType":"road.arterial","stylers":[{"hue":"#FBFF00"},{"saturation":0},{"lightness":0},{"gamma":1}]},{"featureType":"road.local","stylers":[{"hue":"#00FFFD"},{"saturation":0},{"lightness":30},{"gamma":1}]},{"featureType":"water","stylers":[{"hue":"#00BFFF"},{"saturation":6},{"lightness":8},{"gamma":1}]},{"featureType":"poi","stylers":[{"hue":"#679714"},{"saturation":33.4},{"lightness":-25.4},{"gamma":1}]}];
+                 // Constructor creates a new map - only center and zoom are required.
         map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 40.7413549, lng: -73.9980244},
+          center: {lat: currLat, lng: currLng},
           zoom: 13,
           styles: styles,
           mapTypeControl: false
         });
+      }
+      function popularList() {
         var locations = [];
-        var markerdetails;
-
-        function listings() 
-        {
-      	var $fourSquareList = $('.fourSquareLoc');
-      	var articlePhone;
-      	$.getJSON(url,function(data)
-      	{
-      			
-    		   articles = data.response.venues;
-    		   for(var i=0;i <articles.length; i++)
-           {
-           var article = articles[i];
-           articlePhone = ((typeof article.contact.formattedPhone === "undefined") ? " " : article.contact.formattedPhone);    
-           $fourSquareList.append('<li class="article" >' + '<p>' + article.name + '</p>' + 
-          	//'<p>' + article.categories[0].name + '</p>' + 
-           '<p>' +article.location.formattedAddress + '</p>' + '<p>' + articlePhone + '</p>' +'</li><hr>');
-           createLocation(article);
+        var markerdetails;      
+        var url;
+        var popularurl;
+        $.ajax({
+          url:"http://maps.googleapis.com/maps/api/geocode/json?address="+currentLocation+"",
+          type: "POST",
+          success:function(res){
+                currLat=res.results[0].geometry.location.lat;   
+                currLng=res.results[0].geometry.location.lng;  
+                var baseLocation = currLat + "," + currLng;
+                  popularurl="https://api.foursquare.com/v2/venues/explore?ll=" + baseLocation + clientId + limit;     
+                initializeMap()
+                listings(); 
             }
-          var bounds = new google.maps.LatLngBounds();
-          for (var i = 0; i < markers.length; i++) 
-          {
-          	bounds.extend(markers[i].position);          
-          }	
-           	map.fitBounds(bounds);         
-      	 });
-      	}
-      	listings();
-      	function createLocation(venues) 
-        {
-      		var lat = venues.location.lat;
-      		var lng = venues.location.lng;
-      		var markerdetails = venues.name + ":" + venues.location.formattedAddress;
-      		var location = new google.maps.LatLng(lat, lng);      	
-          var largeInfowindow = new google.maps.InfoWindow();
-            // Style the markers a bit. This will be our listing marker icon.
-        	var defaultIcon = makeMarkerIcon('0091ff');
-	        // Create a "highlighted location" marker color for when the user
-	        // mouses over the marker.
-        	var highlightedIcon = makeMarkerIcon('FFFF24');
-        	// Get the position from the location array.
-        	var position = location;
-        	var title = markerdetails;
-        	// Create a marker per location, and put into markers array.
-        	var marker = new google.maps.Marker({
-        	map: map,
-          position: position,
-          title: title,
-          animation: google.maps.Animation.DROP            
-        	});
-        	markers.push(marker);
-        	marker.addListener('click', function() { 
-          populateInfoWindow(this, largeInfowindow);
-          map.panTo(position);
-       	  });
-        	// Push the marker to our array of markers.
-         	marker.addListener('mouseover', function() {
-          this.setIcon(highlightedIcon);
-        	});
-        	marker.addListener('mouseout', function() {
-          this.setIcon(defaultIcon);
-          });
-      }
-    }
-    initializeMap();
-      // This function populates the infowindow when the marker is clicked. We'll only allow
-      // one infowindow which will open at the marker that is clicked, and populate based
-      // on that markers position.
-      function populateInfoWindow(marker, infowindow) {
-       	if (prev_infowindow) {
-           		prev_infowindow.close();
-        	}
-        	prev_infowindow = infowindow;
-          console.log(prev_infowindow);
-        // Check to make sure the infowindow is not already opened on this marker.
-        if (infowindow.marker != marker) {
-          // Clear the infowindow content to give the streetview time to load.
-          infowindow.setContent('');
-          infowindow.marker = marker;
-          // Make sure the marker property is cleared if the infowindow is closed.
-          infowindow.addListener('closeclick', function() {
-            infowindow.marker = null;
-          });
-          var streetViewService = new google.maps.StreetViewService();
-          var radius = 50;
-          // In case the status is OK, which means the pano was found, compute the
-          // position of the streetview image, then calculate the heading, then get a
-          // panorama from that and set the options
-          function getStreetView(data, status) {
-          	 var markerTitleDetails = marker.title.split(":");
-            if (status == google.maps.StreetViewStatus.OK) {
-              var nearStreetViewLocation = data.location.latLng;
-              
-              var heading = google.maps.geometry.spherical.computeHeading(
-                nearStreetViewLocation, marker.position);
-             
-                infowindow.setContent('<div> <h4>' + markerTitleDetails[0] + '</h4><p>' + markerTitleDetails[1] + '</p></div><div id="pano"></div>');
-                var panoramaOptions = {
-                  position: nearStreetViewLocation,
-                  pov: {
-                    heading: heading,
-                    pitch: 30
-                  }
-                };
-              var panorama = new google.maps.StreetViewPanorama(
-                $('.pano'), panoramaOptions);
-            } 
-            else {
-            	
-              	infowindow.setContent('<div> <h4>' + markerTitleDetails[0] + '</h4><p>' + markerTitleDetails[1] + '</p></div>' +
-                '<div>No Street View Found</div>');    
-                }
-      	     }
+        });
+        function listings() {
+                var $fourSquareList = $('.fourSquareLoc');
 
-          // Use streetview service to get the closest streetview image within
-          // 50 meters of the markers position
-          streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
-          // Open the infowindow on the correct marker.
-          infowindow.open(map, marker);
+                $.ajax({
+                   url: popularurl,
+                   success:function(data) {
+                   articles = data.response.groups[0].items;
+                   for(var i=0;i <articles.length; i++)
+                   {                  
+                    var article = articles[i].venue;
+                    var articletip = articles[i].tips[0]; 
+                    setPhotImage(article,articletip);
+                    }
+                  bounds = data.response.suggestedBounds;
+                  if (bounds != undefined) {
+                    mapBounds = new google.maps.LatLngBounds(
+                      new google.maps.LatLng(bounds.sw.lat, bounds.sw.lng),
+                      new google.maps.LatLng(bounds.ne.lat, bounds.ne.lng));
+                    map.fitBounds(mapBounds);
+                  }
+                },
+                error: function() {
+                   $fourSquareList.append('<li class="article-error" >' + '<p>' + "Error while fetching the data. Please try again" + '</p>');
+                } 
+               });
+
           }
+  
+    	function setPhotImage(article,articletip) 
+      {
+        var placePic;
+        var articlePhone;
+        var pickList;
+        var placeImage;
+        var picURL = "https://api.foursquare.com/v2/venues/" + article.id + "/photos?" +clientId;
+        var baseImgURL = 'https://irs3.4sqi.net/img/general/';
+        $.ajax({
+                   url: picURL,
+                   success:function(data) {
+                    placeImage = data.response.photos.items;
+                    for (var i=0;i<placeImage.length;i++) 
+                    {
+                    placePic = baseImgURL + "width150" + placeImage[i].suffix;      
+                    }              
+                    articlePhone = ((typeof article.contact.formattedPhone === "undefined") ? " " : article.contact.formattedPhone);    
+                    pickList = {"popName" : article.name , "popAddr" : article.location.formattedAddress, "popPhone": articlePhone , "popURL": article.url, "popCategory": article.categories[0].name,
+                    "popTips":articletip.text,"popImg":placePic};
+                    self.famousList.push(pickList);
+                    createLocation(article);
+                   },
+                   error:function() {
+                    placePic = this.photoPlaceHolder;
+                   }
+        });
       }
-   
+      function createLocation(venues) 
+      {
+        var lat = venues.location.lat;
+        var lng = venues.location.lng;
+        var markerdetails = venues.name + ":" + venues.location.formattedAddress;
+        var location = new google.maps.LatLng(lat, lng);        
+        infowindow = new google.maps.InfoWindow();
+          // Style the markers a bit. This will be our listing marker icon.
+        var defaultIcon = makeMarkerIcon('0091ff');
+        // Create a "highlighted location" marker color for when the user
+        // mouses over the marker.
+        var highlightedIcon = makeMarkerIcon('FFFF24');
+        // Get the position from the location array.
+        var position = location;
+        var title = markerdetails;
+        var rating = venues.rating;
+        var ratingMul = rating/2;
+        var ratingImg;
+        var placePic;
+         //console.log(venuePhoto[venuePhoto.length-1].placePic);
+        switch(true)
+        {
+          case (ratingMul >= 2.5 && ratingMul < 3):
+            ratingImg = "images/stars_2.5.png";
+            break;
+          case (ratingMul >= 3 && ratingMul < 3.5):
+            ratingImg = "images/stars_3.png";
+            break;
+          case (ratingMul >= 3.5 && ratingMul < 4):
+            ratingImg = "images/stars_3.5.png";
+            break;
+          case (ratingMul >= 4 && ratingMul < 4.5):
+            ratingImg = "images/stars_4.png";
+            break;
+          case (ratingMul >= 4.5 && ratingMul < 5):
+            ratingImg = "images/stars_4.5.png";
+            break;
+          case (ratingMul == 5):
+            ratingImg = "images/stars_5.png";
+        }
+        // Create a marker per location, and put into markers array.
+        var marker = new google.maps.Marker({
+        map: map,
+        position: position,
+        title: title,
+        rating: rating,
+        animation: google.maps.Animation.DROP            
+        });
+        markers.push(marker);
+        marker.addListener('click', function() { 
+        var markerTitleDetails = marker.title.split(":");
+        var PicId = marker.id;
+        infowindow.setContent('<div class="infoDetails"> <h4 class="infoHeader">' 
+                            + markerTitleDetails[0] + '</h4>' +
+                            '<p>' + markerTitleDetails[1] + '</p>' 
+                            + '<div class="infoPara"> <p class="rateNum">' +
+                            + rating + '</p><img src="' + ratingImg + '" class="img-responsive rateImg">' 
+                            + '</div></div>');
+        infowindow.open(map, marker);
+        map.panTo(position);
+        });        
+        // Push the marker to our array of markers.
+        marker.addListener('mouseover', function() {
+        this.setIcon(highlightedIcon);
+        });
+        marker.addListener('mouseout', function() {
+        this.setIcon(defaultIcon);
+        });
+      }
+     }
+      popularList();
+      function clearMarker() {
+        for(var i=0; i<markers.length;i++)
+        {
+          markers[i].setMap(null);
+        }
+        markers = [];
+        self.famousList.removeAll();
+
+      };
+
+      function changeMarkers() {
+        var searchOutList = self.famousList();
+        var assignNull;
+
+        for(var i=0; i<updateMarker.length;i++)
+        {
+          assignNull = true;
+          for(var j=0; j< searchOutList.length;j++)
+          {
+          if(updateMarker[i].title.split(":")[0] === searchOutList[j].popName)
+              {
+                  assignNull = false;
+              }
+          }
+          if(assignNull === true)
+          {
+            updateMarker[i].setMap(null);
+          }
+          else
+          {
+            updateMarker[i].setMap(map); 
+          }
+        }
+      };
+
+      self.changeLocation = function() {
+        currentLocation = self.currentLocation(); 
+        clearMarker();
+        popularList();
+      };
+      self.showInfo = function(clickList) {
+          for(var i=0;i<markers.length;i++)
+          {
+            if(markers[i].title.split(":")[0] === clickList.popName)
+            {
+              google.maps.event.trigger(markers[i], 'click');
+               map.panTo(markers[i].position);
+            }
+          }
+         
+       };
+       self.searchList = function() {
+        var keyword = self.searchData().toLowerCase();
+        var currentList  = self.famousPicklist();
+        var searchMarker = [];
+        if(keyword !== ""){
+         for(var i=0;i<currentList.length;i++)
+          {
+            if((currentList[i].popName.toLowerCase().indexOf(keyword)) !== -1)
+            {
+              searchMarker.push(currentList[i]);
+            }
+          }
+          self.famousList(searchMarker);
+        }
+        else
+        {
+          self.famousList(currentList);
+        }
+        changeMarkers();
+       }
       // This function takes in a COLOR, and then creates a new marker
       // icon of that color. The icon will be 21 px wide by 34 high, have an origin
       // of 0, 0 and be anchored at 10, 34).
@@ -159,6 +257,12 @@ var ViewModel = function() {
           new google.maps.Size(21,34));
         return markerImage;
       }
+      window.addEventListener('resize', function(e) {
+      
+       map.fitBounds(bounds);
+      
+       $('#map').height($(window).height());
+      });
 }
 $(function() {
 ko.applyBindings(new ViewModel());
