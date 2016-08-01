@@ -7,13 +7,13 @@
       data entered. Marker will also be shown based on the search data.
       
 ###2. Features
- 1.Map styles were modified 
- 2.Images for the popular places were fetched using api.
- 3.Popular places were fetched using foursquare api.
+ * Map styles were modified. 
+ * Images for the popular places were fetched using api.
+ * Popular places were fetched using foursquare api.
 
 ###3. API used:
- 1.Foursquare API for fetching popular places and images.
- 2.Google API for the map
+ * Foursquare API for fetching popular places and images.
+ * Google API for the map
 
 ###4. Method to run the project:
     http://priyasuriyamurthi.github.io/neighbourhood-map/index.html
