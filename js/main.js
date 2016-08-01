@@ -5,7 +5,7 @@ var ViewModel = function() {
     // Create a new blank array for all the listing markers.
     var markers = [];
     this.photoPlaceHolder = 'http://placehold.it/100x100';
-    var updateMarker = markers;
+    var updateMarker; 
     var infowindow;
     var currentLocation = "Austin";
     self.currentLocation = ko.observable(currentLocation);
@@ -267,7 +267,7 @@ var ViewModel = function() {
         }
         markers = [];
         self.famousList.removeAll();
-
+        updateMarker.length = 0;
     }
     // alter the center when there is a resize
     window.addEventListener('resize', function(e) {
@@ -314,6 +314,7 @@ var ViewModel = function() {
         var keyword = self.searchData().toLowerCase();
         var currentList = self.famousPicklist();
         var searchMarker = [];
+        updateMarker = markers;
         if (keyword !== "") {
             for (var i = 0; i < currentList.length; i++) {
                 if ((currentList[i].popName.toLowerCase().indexOf(keyword)) !== -1) {
@@ -338,7 +339,7 @@ var ViewModel = function() {
             new google.maps.Point(0, 0),
             new google.maps.Point(10, 34),
             new google.maps.Size(21, 34));
-        return markerImage;
+            return markerImage;
     }
 
 };
