@@ -5,7 +5,7 @@ var ViewModel = function() {
     // Create a new blank array for all the listing markers.
     var markers = [];
     this.photoPlaceHolder = 'http://placehold.it/100x100';
-    var updateMarker; 
+    var updateMarker = markers; 
     var infowindow;
     var currentLocation = "Austin";
     self.currentLocation = ko.observable(currentLocation);
@@ -17,7 +17,7 @@ var ViewModel = function() {
     var limit = "&limit=20&section=popularPicks";
     var clientId = "&client_id=QRFWJTS1ITKK3SGV3C3YMHOPY2OGYJWKVKKLLP5SZKLXPBSM&client_secret=XM0IRYFCUVW4WENIKHR111BGJ2AFWLYCGGD2ZT4I211TPZZJ&v=20160115";
     var isNavVisible = false;
-    self.searchData = ko.observable("");
+    self.searchData = ko.observable(" ");
     function initializeMap() {
         // Create a styles array to use with the map.
         var styles = [{
@@ -267,7 +267,10 @@ var ViewModel = function() {
         }
         markers = [];
         self.famousList.removeAll();
-        updateMarker.length = 0;
+        while(updateMarker.length > 0) {
+        updateMarker.pop();
+        }
+
     }
     // alter the center when there is a resize
     window.addEventListener('resize', function(e) {
