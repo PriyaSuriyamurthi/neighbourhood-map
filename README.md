@@ -1,5 +1,4 @@
-# neighbourhood-map
-# neighbourhood map project
+# Neighbourhood map project
 
 ###1. Description:
       The project is about displaying the popular places for a particular location. Markers are provided and points to 
