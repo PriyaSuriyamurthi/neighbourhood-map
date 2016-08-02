@@ -93,7 +93,7 @@ var ViewModel = function() {
                 lat: currLat,
                 lng: currLng
             },
-            zoom: 13,
+            zoom: 21,
             styles: styles,
             mapTypeControl: false
         });
