@@ -15,6 +15,6 @@
  * Google API for the map
 
 ###4. Method to run the project:
-    http://priyasuriyamurthi.github.io/neighbourhood-map/index.html
-
+ * http://priyasuriyamurthi.github.io/neighbourhood-map/index.html
+ * Open the file index.html to run the application locally      
 
