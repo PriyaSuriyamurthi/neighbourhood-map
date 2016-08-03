@@ -1,6 +1,6 @@
 var ViewModel = function() {
     var self = this;
-    var map;
+    
     var mapBounds;
     // Create a new blank array for all the listing markers.
     var markers = [];
@@ -18,86 +18,7 @@ var ViewModel = function() {
     var clientId = "&client_id=QRFWJTS1ITKK3SGV3C3YMHOPY2OGYJWKVKKLLP5SZKLXPBSM&client_secret=XM0IRYFCUVW4WENIKHR111BGJ2AFWLYCGGD2ZT4I211TPZZJ&v=20160115";
     var isNavVisible = false;
     self.searchData = ko.observable(" ");
-    function initializeMap() {
-        // Create a styles array to use with the map.
-        var styles = [{
-            "featureType": "landscape",
-            "stylers": [{
-                "hue": "#FFA800"
-            }, {
-                "saturation": 0
-            }, {
-                "lightness": 0
-            }, {
-                "gamma": 1
-            }]
-        }, {
-            "featureType": "road.highway",
-            "stylers": [{
-                "hue": "#53FF00"
-            }, {
-                "saturation": -73
-            }, {
-                "lightness": 40
-            }, {
-                "gamma": 1
-            }]
-        }, {
-            "featureType": "road.arterial",
-            "stylers": [{
-                "hue": "#FBFF00"
-            }, {
-                "saturation": 0
-            }, {
-                "lightness": 0
-            }, {
-                "gamma": 1
-            }]
-        }, {
-            "featureType": "road.local",
-            "stylers": [{
-                "hue": "#00FFFD"
-            }, {
-                "saturation": 0
-            }, {
-                "lightness": 30
-            }, {
-                "gamma": 1
-            }]
-        }, {
-            "featureType": "water",
-            "stylers": [{
-                "hue": "#00BFFF"
-            }, {
-                "saturation": 6
-            }, {
-                "lightness": 8
-            }, {
-                "gamma": 1
-            }]
-        }, {
-            "featureType": "poi",
-            "stylers": [{
-                "hue": "#679714"
-            }, {
-                "saturation": 33.4
-            }, {
-                "lightness": -25.4
-            }, {
-                "gamma": 1
-            }]
-        }];
-        // Constructor creates a new map - only center and zoom are required. Style was added
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: {
-                lat: currLat,
-                lng: currLng
-            },
-            zoom: 21,
-            styles: styles,
-            mapTypeControl: false
-        });
-    }
+    
     // make the popular place details invisible when width is less than 900 and show it only on click
     $('#pointerArrow').click(function() {
         if ($(window).width() < 900) {
@@ -124,8 +45,10 @@ var ViewModel = function() {
                 currLng = res.results[0].geometry.location.lng;
                 var baseLocation = currLat + "," + currLng;
                 popularurl = "https://api.foursquare.com/v2/venues/explore?ll=" + baseLocation + clientId + limit;
-                initializeMap();
                 listings();
+            },
+            error: function() {
+                    alert("Error while loading the location mentioned in the text box");
             }
         });
 
@@ -196,7 +119,7 @@ var ViewModel = function() {
             var location = new google.maps.LatLng(lat, lng);
             infowindow = new google.maps.InfoWindow();
             // Style the markers a bit. This will be our listing marker icon.
-            var defaultIcon = makeMarkerIcon('0091ff');
+            var defaultIcon = makeMarkerIcon('FE7569');
             // Create a "highlighted location" marker color for when the user
             // mouses over the marker.
             var highlightedIcon = makeMarkerIcon('FFFF24');
@@ -235,6 +158,19 @@ var ViewModel = function() {
                 rating: rating,
                 animation: google.maps.Animation.DROP
             });
+           function toggleBounce(markerBounce) {
+                if (markerBounce.getAnimation() == null) {
+                  marker.setAnimation(null);
+                  stopBounce();
+                  markerBounce.setAnimation(google.maps.Animation.BOUNCE);
+                }
+              };
+            function stopBounce() {
+                for(var i=0;i<markers.length;i++)
+                  {
+                    markers[i].setAnimation(null);
+                  }
+            }  
             markers.push(marker);
             // Personalized the info window when the marker is clicked
             marker.addListener('click', function() {
@@ -248,7 +184,11 @@ var ViewModel = function() {
                     ratingMul + '</p>' +
                     '</div></div>');
                 infowindow.open(map, marker);
+                toggleBounce(marker);
                 map.panTo(position);
+            });
+            google.maps.event.addListener(infowindow,'closeclick',function(){
+                stopBounce();
             });
             // Push the marker to our array of markers.
             marker.addListener('mouseover', function() {
@@ -298,7 +238,7 @@ var ViewModel = function() {
             }
         }
     }
-
+    
     self.changeLocation = function() {
         currentLocation = self.currentLocation();
         clearMarker();
@@ -346,6 +286,88 @@ var ViewModel = function() {
     }
 
 };
-$(function() {
-    ko.applyBindings(new ViewModel());
-});
+
+var map;
+function initMap() {
+        // Create a styles array to use with the map.
+        var styles = [{
+            "featureType": "landscape",
+            "stylers": [{
+                "hue": "#FFA800"
+            }, {
+                "saturation": 0
+            }, {
+                "lightness": 0
+            }, {
+                "gamma": 1
+            }]
+        }, {
+            "featureType": "road.highway",
+            "stylers": [{
+                "hue": "#53FF00"
+            }, {
+                "saturation": -73
+            }, {
+                "lightness": 40
+            }, {
+                "gamma": 1
+            }]
+        }, {
+            "featureType": "road.arterial",
+            "stylers": [{
+                "hue": "#FBFF00"
+            }, {
+                "saturation": 0
+            }, {
+                "lightness": 0
+            }, {
+                "gamma": 1
+            }]
+        }, {
+            "featureType": "road.local",
+            "stylers": [{
+                "hue": "#00FFFD"
+            }, {
+                "saturation": 0
+            }, {
+                "lightness": 30
+            }, {
+                "gamma": 1
+            }]
+        }, {
+            "featureType": "water",
+            "stylers": [{
+                "hue": "#00BFFF"
+            }, {
+                "saturation": 6
+            }, {
+                "lightness": 8
+            }, {
+                "gamma": 1
+            }]
+        }, {
+            "featureType": "poi",
+            "stylers": [{
+                "hue": "#679714"
+            }, {
+                "saturation": 33.4
+            }, {
+                "lightness": -25.4
+            }, {
+                "gamma": 1
+            }]
+        }];
+        // Constructor creates a new map - only center and zoom are required. Style was added
+        map = new google.maps.Map(document.getElementById('map'), {
+            center:  {lat: 30.2669444, lng: -97.7427778},
+            zoom: 21,
+            styles: styles,
+            mapTypeControl: false
+        });
+        ko.applyBindings(new ViewModel());
+    }
+
+    function initMapLoadError() {
+        alert('Failed to initialize Google Map');
+        console.log('Failed to initialize Google Map');
+    }
